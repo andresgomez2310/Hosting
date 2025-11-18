@@ -1,0 +1,29 @@
+services:
+  manager:
+    build: ./manager
+    container_name: manager
+    ports:
+      - "5000:5000"
+    networks:
+      - hosting_net
+
+  dashboard:
+    build: ./dashboard
+    container_name: dashboard
+    networks:
+      - hosting_net
+
+  proxy:
+    build: ./proxy
+    container_name: proxy
+    depends_on:
+      - dashboard
+      - manager
+    ports:
+      - "80:80"
+    networks:
+      - hosting_net
+
+networks:
+  hosting_net:
+    driver: bridge
