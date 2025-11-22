@@ -1,0 +1,7 @@
+{
+  "short_name": "ReactTemplate",
+  "name": "React Template Project",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone"
+}
