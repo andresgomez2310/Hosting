@@ -1,47 +1,325 @@
+/* ======== GLOBAL RESET ======== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ======== BODY (CORREGIDO) ======== */
 body {
-    margin: 0;
-    background: #f4f4f4;
-    font-family: Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
+  background: #f0f4ff;
+  min-height: 100vh;
 }
 
-.container {
-    width: 360px;
-    margin: 60px auto;
-    padding: 25px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* ======== CONTAINER CARD ======== */
+.card {
+  width: 420px;
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  text-align: center;
+  margin: auto;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
+/* ======== TITLES ======== */
+.card h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #1e3a8a;
 }
 
-input, button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+/* ======== INPUTS ======== */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border: 2px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: border-color 0.2s;
 }
 
-button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    cursor: pointer;
+input:focus {
+  border-color: #2563eb;
+  outline: none;
 }
 
-button:hover {
-    background: #1d4ed8;
+/* ======== BUTTONS ======== */
+.btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
+.btn:hover {
+  background: #1d4ed8;
+}
+
+.btn-secondary {
+  background: #64748b;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+}
+
+/* ======== SMALL BUTTON ======== */
+.btn-small {
+  margin-top: 20px;
+  background: #e0e7ff;
+  color: #1e3a8a;
+  width: auto;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-small:hover {
+  background: #c7d2fe;
+}
+
+/* ======== LINKS ======== */
 a {
-    color: #2563eb;
-    text-decoration: none;
+  color: #2563eb;
+  text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+}
+
+/* ======== EMPTY STATE ======== */
+.empty-box {
+  background: #eef2ff;
+  padding: 20px;
+  border-radius: 10px;
+  color: #4338ca;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+/* ======== LIST ======== */
+ul {
+  text-align: left;
+  margin-top: 10px;
+}
+
+li {
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* === DASHBOARD STYLING === */
+.dashboard {
+  width: 450px;
+  padding: 40px;
+}
+
+.title {
+  margin-bottom: 30px;
+  color: #1e3a8a;
+}
+
+.dashboard-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.dashboard-btn {
+  width: auto;
+  padding: 12px 20px;
+}
+
+.logout-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+/* === LAYOUT GRID === */
+.layout {
+  display: flex;
+}
+
+/* === MAIN CONTENT (FALTABA, YA INCLUIDO) === */
+.main-content {
+  margin-left: 220px;
+  padding: 50px 40px;
+  width: calc(100% - 220px);
+  transition: margin-left 0.25s ease-in-out;
+}
+
+.main-content.collapsed {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 220px;
+  background: rgba(30, 58, 138, 0.8);
+  backdrop-filter: blur(6px);
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+  padding-top: 30px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.15);
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: width 0.25s ease-in-out, background 0.25s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Sidebar colapsado */
+.sidebar.collapsed {
+  width: 70px;
+  background: rgba(30, 58, 138, 0.35);
+}
+
+/* Botón colapsar */
+.collapse-btn {
+  background: #3b82f6;
+  border: none;
+  padding: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  align-self: center;
+  margin-bottom: 20px;
+}
+
+/* Contenedor de enlaces */
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Ítems del sidebar */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: #2563eb;
+  padding: 12px;
+  border-radius: 10px;
+
+  text-decoration: none;
+  color: white;
+  transition: 0.2s ease;
+  width: 100%;
+}
+
+/* Ícono */
+.icon {
+  font-size: 22px;
+  width: 26px;
+  text-align: center;
+}
+
+/* Texto */
+.label {
+  font-size: 16px;
+  opacity: 1;
+  white-space: nowrap;
+  transition: opacity 0.25s ease;
+}
+
+/* Colapsado → se esconde el texto, pero el ícono queda centrado */
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+}
+
+.sidebar.collapsed .label {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Botón logout */
+.sidebar-logout {
+  background: #dc2626;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.sidebar.collapsed .sidebar-logout {
+  justify-content: center;
+}
+
+.sidebar-logout:hover {
+  background: #b91c1c;
+}
+/*FINAL SIDEBAR */
+
+.create-card {
+  width: 520px !important;
+  padding: 40px;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.error-text {
+  color: #dc2626;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  display: block;
+  margin-top: 15px;
+  width: 100%;
+  background: #e2e8f0;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background: #cbd5e1;
 }

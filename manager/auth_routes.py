@@ -1,26 +1,33 @@
 """
 Rutas de autenticación para el servicio Manager.
-Integran el RobleClient para login, registro, refresh y validación.
+Integran RobleClient y sincronizan el token del usuario.
 """
 
 from flask import Blueprint, request, jsonify
-import logging
 from roble_client import RobleClient
-from activity_monitor import monitor  # 🔥 IMPORTANTE: traer el monitor real
+from activity_monitor import monitor
+import logging
+
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 auth_blueprint = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
-
 roble = RobleClient()
 
-# =============================================================
-# =========================== LOGIN ============================
-# =============================================================
+# ===========================
+# TOKEN GLOBAL DEL MANAGER
+# ===========================
+MANAGER_TOKEN = None
+
+
+# ===========================
+# LOGIN
+# ===========================
 
 @auth_blueprint.route("/login", methods=["POST"])
 def login():
     """
-    Inicia sesión con email + password usando Roble.
+    Inicia sesión contra Roble.
     """
     try:
         data = request.get_json()
@@ -30,8 +37,11 @@ def login():
         if not email or not password:
             return jsonify({"error": "Email y contraseña requeridos"}), 400
 
+        logger.info(f"LOGIN ATTEMPT: {email}")
         auth = roble.login(email, password)
         user = auth.get("user")
+
+        logger.info(f"LOGIN SUCCESS: {email}")
 
         return jsonify({
             "success": True,
@@ -41,48 +51,49 @@ def login():
         }), 200
 
     except Exception as e:
-        logger.error(f"Error en login: {e}")
+        logger.error(f"Login error: {e}")
         return jsonify({"error": "Credenciales incorrectas"}), 401
 
 
-# =============================================================
-# ======== Permitir al frontend activar el Monitor ============
-# =============================================================
+# ===========================
+# use_token → ACTIVA EL TOKEN EN EL MANAGER
+# ===========================
 
 @auth_blueprint.route("/use_token", methods=["POST"])
 def use_token():
     """
-    El frontend nos envía el accessToken.
-    - Lo activamos en el monitor.
-    - Devolvemos confirmación y el token (importante para frontend).
+    Recibe el token del usuario desde el frontend
+    y lo guarda en el Manager para todas las rutas.
     """
+    global MANAGER_TOKEN
+
     try:
         data = request.get_json()
-
-        # Aceptar ambos formatos por seguridad:
         token = data.get("accessToken") or data.get("token")
 
         if not token:
             return jsonify({"error": "accessToken requerido"}), 400
 
-        # Activar monitor
-        monitor.set_token(token)
+        MANAGER_TOKEN = token  # 🔥 Token guardado
 
-        # Confirmar al frontend
+        monitor.set_token(token)  # Se lo pasamos al monitor también
+
+        logger.info("🔐 Manager recibió y guardó token correctamente.")
+
         return jsonify({
             "success": True,
-            "message": "Token aplicado al monitor",
+            "message": "Token aplicado al Manager",
             "accessToken": token
         }), 200
 
     except Exception as e:
-        logger.error(f"Error aplicando token al monitor: {e}")
+        logger.error(f"Error aplicando token: {e}")
         return jsonify({"error": "No se pudo aplicar token"}), 400
 
 
-# =============================================================
-# =========================== SIGNUP ===========================
-# =============================================================
+# ===========================
+# SIGNUP
+# ===========================
 
 @auth_blueprint.route("/signup", methods=["POST"])
 def signup():
@@ -97,30 +108,30 @@ def signup():
             return jsonify({"error": "Email, contraseña y nombre requeridos"}), 400
 
         roble.signup_direct(email, password, name)
+        logger.info(f"SIGNUP SUCCESS: {email}")
 
-        return jsonify({
-            "success": True,
-            "message": "Usuario registrado exitosamente"
-        }), 201
+        return jsonify({"success": True, "message": "Usuario creado"}), 201
 
     except Exception as e:
         logger.error(f"Signup error: {e}")
-        return jsonify({"error": "Error registrando usuario"}), 400
+        return jsonify({"error": "Error creando usuario"}), 400
 
 
-# =============================================================
-# ============================ LOGOUT ==========================
-# =============================================================
+# ===========================
+# LOGOUT
+# ===========================
 
 @auth_blueprint.route("/logout", methods=["POST"])
 def logout():
+    global MANAGER_TOKEN
     try:
-        token = request.headers.get("Authorization")
-        if not token or not token.startswith("Bearer "):
-            return jsonify({"error": "Token requerido"}), 401
+        if MANAGER_TOKEN:
+            roble.logout(MANAGER_TOKEN)
 
-        token = token.split(" ")[1]
-        roble.logout(token)
+        MANAGER_TOKEN = None
+        monitor.set_token(None)
+
+        logger.info("LOGOUT SUCCESS.")
 
         return jsonify({"success": True, "message": "Sesión cerrada"}), 200
 
@@ -128,59 +139,18 @@ def logout():
         return jsonify({"error": "No se pudo cerrar sesión"}), 400
 
 
-# =============================================================
-# ========================== GET USER ==========================
-# =============================================================
-
-@auth_blueprint.route("/me", methods=["GET"])
-def me():
-    try:
-        token = request.headers.get("Authorization")
-        if not token or not token.startswith("Bearer "):
-            return jsonify({"error": "Token requerido"}), 401
-
-        token = token.split(" ")[1]
-        user = roble.verify_token(token)
-
-        return jsonify({"success": True, "user": user}), 200
-
-    except Exception:
-        return jsonify({"error": "Token inválido"}), 401
-
-
-# =============================================================
-# =========================== REFRESH ==========================
-# =============================================================
-
-@auth_blueprint.route("/refresh", methods=["POST"])
-def refresh():
-    try:
-        data = request.get_json()
-        refresh_token = data.get("refreshToken")
-
-        if not refresh_token:
-            return jsonify({"error": "refreshToken requerido"}), 400
-
-        new_tokens = roble.refresh_token(refresh_token)
-        return jsonify({"accessToken": new_tokens["accessToken"]}), 200
-
-    except Exception:
-        return jsonify({"error": "No se pudo refrescar el token"}), 400
-
-
-# =============================================================
-# =========================== VERIFY ===========================
-# =============================================================
+# ===========================
+# VERIFICAR
+# ===========================
 
 @auth_blueprint.route("/verify", methods=["GET"])
 def verify():
     try:
-        token = request.headers.get("Authorization")
-        if not token or not token.startswith("Bearer "):
+        global MANAGER_TOKEN
+        if not MANAGER_TOKEN:
             return jsonify({"valid": False}), 401
 
-        token = token.split(" ")[1]
-        user = roble.verify_token(token)
+        user = roble.verify_token(MANAGER_TOKEN)
 
         return jsonify({"valid": True, "user": user}), 200
 

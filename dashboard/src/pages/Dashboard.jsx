@@ -1,37 +1,21 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "../styles.css";
 
 export default function Dashboard() {
-    const navigate = useNavigate();
+  return (
+    <div className="card dashboard">
+      <h1 className="title">Panel Principal</h1>
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
-    };
+      <div className="dashboard-buttons">
+        <Link className="btn dashboard-btn" to="/projects">
+          Mis proyectos
+        </Link>
 
-    return (
-        <div className="container">
-            <h1>Panel Principal</h1>
-
-            <nav>
-                <Link to="/projects">Mis Proyectos</Link><br/>
-                <Link to="/create">Crear Proyecto</Link><br/><br/>
-
-                <button 
-                    onClick={logout} 
-                    style={{
-                        marginTop: "10px",
-                        background: "red",
-                        color: "white",
-                        padding: "8px 12px",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer"
-                    }}
-                >
-                    Cerrar Sesión
-                </button>
-            </nav>
-        </div>
-    );
+        <Link className="btn dashboard-btn" to="/projects/create">
+          Crear proyecto
+        </Link>
+      </div>
+    </div>
+  );
 }

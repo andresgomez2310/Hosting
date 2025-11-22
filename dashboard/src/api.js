@@ -1,49 +1,64 @@
-// api.js – versión final CORRECTA
+const API_URL = "";
 
 export async function login(email, password) {
-    const res = await fetch(`/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-    return res.json();
+  const r = await fetch(`/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  return r.json();
 }
 
 export async function registerUser(data) {
-    const res = await fetch(`/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-    return res.json();
+  const r = await fetch(`/auth/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  return r.json();
 }
 
-// Necesario para activar el monitor del backend
-export async function sendTokenToMonitor(accessToken) {
-    return fetch(`/auth/use_token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken })
-    }).then(res => res.json());
+export async function sendTokenToMonitor(token) {
+  const r = await fetch(`/auth/use_token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ accessToken: token }),
+  });
+
+  return r.json();
 }
 
-export async function getProjects(token) {
-    const res = await fetch(`/projects/mine`, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-    return res.json();
+export async function createProject(nombre, repo_url) {
+  const token = localStorage.getItem("token");
+
+  const r = await fetch(`/projects/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ nombre, repo_url }),
+  });
+
+  return r.json();
 }
 
-export async function createProject(token, data) {
-    const res = await fetch(`/projects/create`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-    });
-    return res.json();
+export async function getMyProjects() {
+  const token = localStorage.getItem("token");
+
+  const r = await fetch(`/projects/mine`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return r.json();
 }

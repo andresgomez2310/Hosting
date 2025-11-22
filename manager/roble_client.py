@@ -4,7 +4,7 @@ import os
 class RobleClient:
     def __init__(self):
         self.BASE = os.getenv("ROBLE_URL", "https://roble-api.openlab.uninorte.edu.co")
-        self.CONTRACT = os.getenv("ROBLE_CONTRACT", "hosting_adcce8f544")
+        self.CONTRACT = os.getenv("ROBLE_CONTRACT", "pc2_394e10a6d2")
 
     # ============================================================
     # ========================= LOGIN =============================
