@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plantilla Estática - ROBLE</title>
+
+  <style>
+    /* ====== RESET SIMPLE ====== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ====== ESTILOS GENERALES ====== */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f4f7;
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 32px;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.4s ease;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 12px;
+      color: #111;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 20px 0;
+    }
+
+    /* Animación sutil */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Plantilla Estática</h1>
+    <p>Esta es una plantilla HTML estática de ejemplo para la plataforma de hosting.</p>
+    <p><a href="/">Volver al inicio</a></p>
+    <hr>
+    <p style="text-align:center; font-size:14px; color:#666;">
+      Generado por la plataforma <strong>ROBLE</strong>
+    </p>
+  </div>
+</body>
+</html>
