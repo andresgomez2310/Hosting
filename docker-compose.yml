@@ -1,9 +1,11 @@
+version: "3.8"
+
 services:
   manager:
     build: ./manager
     container_name: manager
     env_file:
-      - ./manager/.env
+      - .env  
     ports:
       - "5000:5000"
     networks:
@@ -14,17 +16,31 @@ services:
     container_name: dashboard
     networks:
       - hosting_net
+    environment:
+      - DEBUG=true
+    command: >
+      sh -c "echo '🌐 Dashboard corriendo internamente en http://dashboard:80'; 
+      nginx -g 'daemon off;'"
 
   proxy:
     build: ./proxy
     container_name: proxy
     depends_on:
-      - manager
       - dashboard
-    ports:
-      - "80:80"
+      - manager
     networks:
       - hosting_net
+    ports:
+      - "80:80"
+    entrypoint: >
+      /bin/sh -c "
+        echo '⏳ Esperando a que Dashboard esté listo...';
+        while ! curl -s http://dashboard:80/index.html; do 
+          sleep 2; 
+        done;
+        echo '🚀 Dashboard detectado, iniciando Proxy.';
+        exec nginx -g 'daemon off;'
+      "
 
 networks:
   hosting_net:

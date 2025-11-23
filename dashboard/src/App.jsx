@@ -1,30 +1,74 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Pages
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ProjectList from "./pages/ProjectList.jsx";
 import CreateProject from "./pages/CreateProject.jsx";
 
+// Components
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Layout from "./components/Layout.jsx";
+
 export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
 
-    const ProtectedRoute = ({ children }) => {
-        const token = localStorage.getItem("token");
-        return token ? children : <Navigate to="/login" />;
-    };
+        {/* === PUBLIC ROUTES (SIN SIDEBAR) === */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+        {/* === RUTA INICIAL (DESPUÉS DE LOGIN) === */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
-                <Route path="/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
-            </Routes>
-        </BrowserRouter>
-    );
+        {/* === DASHBOARD === */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* === PROJECT LIST === */}
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProjectList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* === CREATE PROJECT === */}
+        <Route
+          path="/projects/create"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CreateProject />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
 }

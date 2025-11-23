@@ -1,34 +1,47 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../api";
-import { useNavigate } from "react-router-dom";
+import "../styles.css";
 
 export default function Register() {
-    const [data, setData] = useState({
-        email: "",
-        password: "",
-        name: ""
-    });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    const handleRegister = async () => {
-        const res = await registerUser(data);
-        alert(res.message);
+    try {
+      const res = await registerUser({ name, email, password });
 
-        if (res.success) navigate("/login");
-    };
+      if (res.success) {
+        alert("Registro exitoso. Ahora inicia sesión.");
+        navigate("/login");
+      } else {
+        setError(res.error || "No se pudo registrar.");
+      }
+    } catch (err) {
+      setError("Error de red.");
+    }
+  };
 
-    return (
-        <div className="container">
-            <h1>Registro</h1>
+  return (
+    <div className="card">
+      <h1>Crear cuenta</h1>
 
-            <input placeholder="Nombre" onChange={e => setData({ ...data, name: e.target.value })} />
-            <input type="email" placeholder="Correo" onChange={e => setData({ ...data, email: e.target.value })} />
-            <input type="password" placeholder="Contraseña" onChange={e => setData({ ...data, password: e.target.value })} />
+      <form onSubmit={handleRegister}>
+        <input placeholder="Nombre completo" value={name} onChange={(e) => setName(e.target.value)} />
+        <input placeholder="Correo" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
 
-            <button onClick={handleRegister}>Crear cuenta</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button className="btn" type="submit">Registrarse</button>
+      </form>
 
-            <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
-        </div>
-    );
+      <Link to="/login" className="btn-small">Volver</Link>
+    </div>
+  );
 }
