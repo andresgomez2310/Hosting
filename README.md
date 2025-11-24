@@ -15,17 +15,17 @@ cd Hosting
 
 ## 2️⃣ Crear el archivo `.env` dentro de /manager
 
-Dentro de la carpeta `manager/`, crea un archivo llamado:
+Dentro de la carpeta root, crea un archivo llamado:
 
 ```
-manager/.env
+.env
 ```
 
 Con el siguiente contenido:
 
 ```
 ROBLE_URL=https://roble-api.openlab.uninorte.edu.co
-ROBLE_CONTRACT=hosting_adcce8f544
+ROBLE_CONTRACT=pc2_394e10a6d2
 ```
 
 > Este archivo **es obligatorio** para que el backend funcione.
