@@ -31,7 +31,7 @@ export async function login(email, password) {
 // 🧑‍💻 REGISTRO
 // ===============================
 export async function registerUser(data) {
-  const r = await fetch(`/auth/signup`, {
+  const r = await fetch(`/auth/signup-direct`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

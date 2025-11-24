@@ -18,6 +18,78 @@ roble = RobleClient()
 
 
 # =============================================================
+# =========================== SIGNUP ===========================
+# =============================================================
+
+@auth_blueprint.route("/signup-direct", methods=["POST"])
+def signup_direct():
+    try:
+        data = request.get_json()
+
+        email = data.get("email")
+        password = data.get("password")
+        name = data.get("name")
+
+        if not email or not password or not name:
+            return jsonify({"error": "Email, contraseña y nombre requeridos"}), 400
+
+        result = roble.signup_direct(email, password, name)
+
+        return jsonify({
+            "success": True,
+            "message": "Usuario creado en Roble",
+            "roble_response": result
+        }), 200
+
+    except Exception as e:
+        print("----- ERROR EN ROBLE -----")
+        print("Error:", e)
+
+        mensaje_real = None
+        try:
+            mensaje_real = e.response.json().get("message")
+        except:
+            pass
+
+        if mensaje_real:
+            return jsonify({"error": mensaje_real}), 400
+
+        return jsonify({"error": "Error registrando usuario"}), 400
+
+
+
+# =============================================================
+# ====================== VERIFY CODE ===========================
+# =============================================================
+
+@auth_blueprint.route("/verify_code", methods=["POST"])
+def verify_code():
+    """
+    Verifica el código enviado al correo del usuario.
+    """
+    try:
+        data = request.get_json()
+
+        email = data.get("email")
+        code = data.get("code")
+
+        if not email or not code:
+            return jsonify({"error": "Email y código requeridos"}), 400
+
+        roble.verify_code(email, code)
+
+        logger.info(f"EMAIL VERIFIED: {email}")
+
+        return jsonify({
+            "success": True,
+            "message": "Cuenta verificada correctamente"
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Verify code error: {e}")
+        return jsonify({"error": "Código incorrecto o expirado"}), 400
+
+# =============================================================
 # =========================== LOGIN ============================
 # =============================================================
 

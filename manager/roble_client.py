@@ -9,6 +9,16 @@ class RobleClient:
         self.BASE = os.getenv("ROBLE_URL", "https://roble-api.openlab.uninorte.edu.co")
         self.CONTRACT = os.getenv("ROBLE_CONTRACT", "pc2_394e10a6d2")
 
+    # SIGNUP
+    def signup_direct(self, email, password, name):
+        url = f"{self.BASE}/auth/{self.CONTRACT}/signup-direct"
+        resp = requests.post(url, json={
+            "email": email,
+            "password": password,
+            "name": name
+        })
+        resp.raise_for_status()
+        return resp.json()
     # LOGIN
     def login(self, email, password):
         url = f"{self.BASE}/auth/{self.CONTRACT}/login"
