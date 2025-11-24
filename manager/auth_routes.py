@@ -35,21 +35,24 @@ def signup_direct():
 
         return jsonify({
             "success": True,
-            "user": result["user"]
+            "message": "Usuario creado en Roble",
+            "roble_response": result
         }), 200
 
     except Exception as e:
         print("----- ERROR EN ROBLE -----")
         print("Error:", e)
 
-        # 👇 ESTA ES LA LÍNEA IMPORTANTE
+        mensaje_real = None
         try:
-            print("Roble respondió:", e.response.text)
+            mensaje_real = e.response.json().get("message")
         except:
             pass
 
-        return jsonify({"error": "Error registrando usuario"}), 400
+        if mensaje_real:
+            return jsonify({"error": mensaje_real}), 400
 
+        return jsonify({"error": "Error registrando usuario"}), 400
 
 
 
