@@ -10,7 +10,7 @@ import subprocess
 import requests
 import os
 from datetime import datetime
-from activity_monitor import monitor  # ← el token ahora viene del monitor
+from activity_monitor import monitor
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
@@ -19,9 +19,8 @@ logger = logging.getLogger(__name__)
 
 roble = RobleClient()
 
-
 # =============================================================
-#   TOKEN GLOBAL DEL MANAGER — SIEMPRE VIENE DEL MONITOR
+#   OBTENER TOKEN GLOBAL (del monitor)
 # =============================================================
 
 def get_manager_token():
@@ -32,7 +31,7 @@ def get_manager_token():
 
 
 # =============================================================
-#   OBTENER USER_ID REAL DESDE TOKEN
+#   OBTENER USER_ID DE /auth/{contract}/verify-token
 # =============================================================
 
 def get_user_id():
@@ -41,21 +40,24 @@ def get_user_id():
         return None
 
     base = os.getenv("ROBLE_URL", "https://roble-api.openlab.uninorte.edu.co")
-    contract = os.getenv("ROBLE_CONTRACT", "pc2_394e10a6d2")   # ⚡ tu contrato correcto
+    contract = os.getenv("ROBLE_CONTRACT", "pc2_394e10a6d2")  # contrato REAL
 
     url = f"{base}/auth/{contract}/verify-token"
 
     try:
-        r = requests.get(url, headers={"Authorization": f"Bearer {token}"})
-        if r.status_code != 200:
-            logger.error(f"verify-token error: {r.text}")
+        resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
+        data = resp.json()
+
+        logger.info(f"===== verify-token RESPONSE =====")
+        logger.info(data)
+
+        if not data.get("valid"):
             return None
 
-        data = r.json().get("user", {})
-        return data.get("id") or data.get("_id")
+        return data.get("user", {}).get("sub")
 
     except Exception as e:
-        logger.error(f"Error verificando token: {e}")
+        logger.error(f"Error en get_user_id(): {e}")
         return None
 
 
@@ -71,26 +73,25 @@ def crear_proyecto():
 
     data = request.get_json()
     nombre = data.get("nombre")
-    repo = data.get("repo_url")
+    rep_url = data.get("repo_url")
 
-    if not nombre or not repo:
+    if not nombre or not rep_url:
         return jsonify({"error": "Faltan campos requeridos"}), 400
 
     user_id = get_user_id()
     if not user_id:
-        return jsonify({"error": "Token inválido"}), 401
+        return jsonify({"error": "No se pudo obtener user_id"}), 401
 
-    nuevo_registro = {
-        "user_id": user_id,
-        "nombre": nombre,
-        "repo_url": repo,
-        "status": "pending",
-        "container_id": None,
-        "created_at": datetime.utcnow().isoformat(),
-        "last_access": datetime.utcnow().isoformat()
-    }
-
-    proyecto = roble.create_record("proyectos", nuevo_registro, token)
+    try:
+        proyecto = roble.create_project(
+            user_id=user_id,
+            name=nombre,
+            rep_url=rep_url,
+            access_token=token
+        )
+    except Exception as e:
+        logger.error(f"❌ Error creando proyecto: {e}")
+        return jsonify({"error": str(e)}), 500
 
     return jsonify({"success": True, "project": proyecto}), 201
 
@@ -107,13 +108,17 @@ def mis_proyectos():
 
     user_id = get_user_id()
     if not user_id:
-        return jsonify({"error": "Token inválido"}), 401
+        return jsonify({"error": "No se pudo obtener user_id"}), 401
 
-    proyectos = roble.read_records(
-        "proyectos",
-        filters={"user_id": user_id},
-        access_token=token
-    )
+    try:
+        proyectos = roble.read_records(
+            "proyectos",
+            filters={"user_id": user_id},
+            access_token=token
+        )
+    except Exception as e:
+        logger.error(f"❌ Error obteniendo proyectos: {e}")
+        return jsonify({"error": "Error obteniendo proyectos"}), 500
 
     return jsonify({"projects": proyectos}), 200
 
@@ -163,26 +168,23 @@ def start_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    container = get_container(project_id, token)
-    if not container:
+    proyecto = roble.read_records(
+        "proyectos",
+        filters={"_id": project_id},
+        access_token=token
+    )
+
+    if not proyecto or not proyecto[0].get("container_"):
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = container["container_id"]
+    cid = proyecto[0]["container_"]
 
     try:
         subprocess.check_call(["docker", "start", cid])
-
-        roble.update_record(
-            "proyectos",
-            project_id,
-            {"status": "running"},
-            token
-        )
-
-        return jsonify({"success": True, "message": "Contenedor iniciado"}), 200
-
+        roble.update_project_status(project_id, "running", cid, token)
+        return jsonify({"success": True})
     except Exception as e:
-        return jsonify({"error": f"Error iniciando contenedor: {e}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # =============================================================
@@ -195,58 +197,23 @@ def stop_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    container = get_container(project_id, token)
-    if not container:
+    proyecto = roble.read_records(
+        "proyectos",
+        filters={"_id": project_id},
+        access_token=token
+    )
+
+    if not proyecto or not proyecto[0].get("container_"):
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = container["container_id"]
+    cid = proyecto[0]["container_"]
 
     try:
         subprocess.check_call(["docker", "stop", cid])
-
-        roble.update_record(
-            "proyectos",
-            project_id,
-            {"status": "stopped"},
-            token
-        )
-
-        return jsonify({"success": True, "message": "Contenedor detenido"}), 200
-
+        roble.update_project_status(project_id, "stopped", cid, token)
+        return jsonify({"success": True})
     except Exception as e:
-        return jsonify({"error": f"Error deteniendo contenedor: {e}"}), 500
-
-
-# =============================================================
-#   RESTART CONTAINER
-# =============================================================
-
-@proyectos_blueprint.route("/restart/<project_id>", methods=["POST"])
-def restart_container(project_id):
-    token = get_manager_token()
-    if not token:
-        return jsonify({"error": "Token requerido"}), 401
-
-    container = get_container(project_id, token)
-    if not container:
-        return jsonify({"error": "Contenedor no encontrado"}), 404
-
-    cid = container["container_id"]
-
-    try:
-        subprocess.check_call(["docker", "restart", cid])
-
-        roble.update_record(
-            "proyectos",
-            project_id,
-            {"status": "running"},
-            token
-        )
-
-        return jsonify({"success": True, "message": "Contenedor reiniciado"}), 200
-
-    except Exception as e:
-        return jsonify({"error": f"Error reiniciando contenedor: {e}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # =============================================================
@@ -259,16 +226,19 @@ def logs_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    container = get_container(project_id, token)
-    if not container:
+    proyecto = roble.read_records(
+        "proyectos",
+        filters={"_id": project_id},
+        access_token=token
+    )
+
+    if not proyecto or not proyecto[0].get("container_"):
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = container["container_id"]
+    cid = proyecto[0]["container_"]
 
     try:
         logs = subprocess.check_output(["docker", "logs", cid], text=True)
-
-        return jsonify({"success": True, "logs": logs}), 200
-
+        return jsonify({"success": True, "logs": logs})
     except Exception as e:
-        return jsonify({"error": f"No se pudieron obtener logs: {e}"}), 500
+        return jsonify({"error": str(e)}), 500

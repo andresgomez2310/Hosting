@@ -5,7 +5,7 @@ services:
     build: ./manager
     container_name: manager
     env_file:
-      - .env  
+      - .env
     ports:
       - "5000:5000"
     networks:
@@ -19,8 +19,7 @@ services:
     environment:
       - DEBUG=true
     command: >
-      sh -c "echo '🌐 Dashboard corriendo internamente en http://dashboard:80'; 
-      nginx -g 'daemon off;'"
+      sh -c "echo '🌐 Dashboard corriendo internamente en http://dashboard:80';  nginx -g 'daemon off;'"
 
   proxy:
     build: ./proxy

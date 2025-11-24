@@ -31,10 +31,8 @@ export default function CreateProject() {
     }
 
     try {
-      const res = await createProject(token, {
-        nombre: name,      // nombre en la BD
-        repo_url: repoUrl, // repo_url en la BD
-      });
+      // 🔥 createProject SOLO recibe estos dos parámetros
+      const res = await createProject(name, repoUrl);
 
       if (res?.success) {
         alert("Proyecto creado correctamente");

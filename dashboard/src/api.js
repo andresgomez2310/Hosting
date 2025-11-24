@@ -1,6 +1,8 @@
-const API_URL = ""; // Asegúrate de tener la URL base correcta aquí si es necesario
+const API_URL = "";
 
-// Función para hacer login
+// ===============================
+// 🔐 LOGIN
+// ===============================
 export async function login(email, password) {
   const r = await fetch(`/auth/login`, {
     method: "POST",
@@ -11,16 +13,23 @@ export async function login(email, password) {
   });
 
   const res = await r.json();
-  
+
   if (res.success) {
-    // Guardamos el token en el localStorage
+    // Guardamos el token
     localStorage.setItem("token", res.accessToken);
+
+    // Guardamos el user_id para asociar proyectos
+    if (res.user && res.user._id) {
+      localStorage.setItem("user_id", res.user._id);
+    }
   }
 
   return res;
 }
 
-// Función para registrar un nuevo usuario
+// ===============================
+// 🧑‍💻 REGISTRO
+// ===============================
 export async function registerUser(data) {
   const r = await fetch(`/auth/signup`, {
     method: "POST",
@@ -33,7 +42,9 @@ export async function registerUser(data) {
   return r.json();
 }
 
-// Función para enviar el token al monitor
+// ===============================
+// 📡 ENVIAR TOKEN AL MONITOR
+// ===============================
 export async function sendTokenToMonitor(token) {
   const r = await fetch(`/auth/use_token`, {
     method: "POST",
@@ -46,7 +57,9 @@ export async function sendTokenToMonitor(token) {
   return r.json();
 }
 
-// Función para crear un proyecto
+// ===============================
+// 📁 CREAR PROYECTO
+// ===============================
 export async function createProject(nombre, repo_url) {
   const token = localStorage.getItem("token");
 
@@ -66,7 +79,9 @@ export async function createProject(nombre, repo_url) {
   return r.json();
 }
 
-// Función para obtener los proyectos del usuario
+// ===============================
+// 📂 OBTENER MIS PROYECTOS
+// ===============================
 export async function getMyProjects() {
   const token = localStorage.getItem("token");
 
@@ -83,7 +98,9 @@ export async function getMyProjects() {
   return r.json();
 }
 
-// Función para actualizar una tabla existente
+// ===============================
+// 🛠️ ACTUALIZAR TABLA
+// ===============================
 export async function updateTable(tableName, description, columns) {
   const token = localStorage.getItem("token");
 
