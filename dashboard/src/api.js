@@ -82,21 +82,18 @@ export async function createProject(nombre, repo_url) {
 // ===============================
 // 📂 OBTENER MIS PROYECTOS
 // ===============================
+
 export async function getMyProjects() {
-  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`/projects/mine`);   // 👈 usa la ruta RELATIVA
 
-  if (!token) {
-    throw new Error("No token found in localStorage");
+    return await res.json();
+  } catch (err) {
+    console.error("API error:", err);
+    return { error: "No se pudo conectar con el servidor." };
   }
-
-  const r = await fetch(`/projects/mine`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return r.json();
 }
+
 
 // ===============================
 // 🛠️ ACTUALIZAR TABLA

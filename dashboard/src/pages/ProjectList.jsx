@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getMyProjects } from "../api";
-
 import { useNavigate, Link } from "react-router-dom";
 
 export default function ProjectList() {
@@ -11,7 +10,6 @@ export default function ProjectList() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/login");
       return;
@@ -19,24 +17,20 @@ export default function ProjectList() {
 
     const load = async () => {
       try {
-        const res = await getMyProjects(token);
+        const res = await getMyProjects();
 
-        if (
-          res?.code === 401 ||
-          res?.status === 401 ||
-          res?.detail === "Not authenticated"
-        ) {
-          localStorage.removeItem("token");
-          alert("Tu sesión ha expirado. Vuelve a iniciar sesión.");
-          navigate("/login");
+        if (res.error) {
+          setError(res.error);
           return;
         }
 
-        if (res?.success) {
-          setProjects(res.projects || []);
-        } else {
-          setError(res?.message || "No se pudieron cargar los proyectos.");
+        if (!Array.isArray(res.projects)) {
+          setError("No se pudieron cargar los proyectos.");
+          return;
         }
+
+        setProjects(res.projects);
+
       } catch (err) {
         console.error("Error al cargar proyectos:", err);
         setError("Error de red al cargar proyectos.");
@@ -58,8 +52,7 @@ export default function ProjectList() {
       {projects.length === 0 ? (
         <div className="empty-box">
           No tienes proyectos creados todavía.
-          <br />
-          <br />
+          <br /><br />
           <Link to="/projects/create" className="btn-small">
             💡 Tip: ¿Quieres crear uno nuevo?
           </Link>
@@ -67,7 +60,7 @@ export default function ProjectList() {
       ) : (
         <ul>
           {projects.map((p) => (
-            <li key={p.id || p.name}>{p.name}</li>
+            <li key={p._id}>{p.name}</li>
           ))}
         </ul>
       )}

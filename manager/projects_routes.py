@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 
 roble = RobleClient()
 
+
 # =============================================================
-#   OBTENER TOKEN GLOBAL (del monitor)
+# TOKEN GLOBAL (siempre viene del monitor)
 # =============================================================
 
 def get_manager_token():
@@ -31,7 +32,7 @@ def get_manager_token():
 
 
 # =============================================================
-#   OBTENER USER_ID DE /auth/{contract}/verify-token
+# OBTENER USER ID DESDE verify-token  (sub)
 # =============================================================
 
 def get_user_id():
@@ -39,30 +40,17 @@ def get_user_id():
     if not token:
         return None
 
-    base = os.getenv("ROBLE_URL", "https://roble-api.openlab.uninorte.edu.co")
-    contract = os.getenv("ROBLE_CONTRACT", "pc2_394e10a6d2")  # contrato REAL
-
-    url = f"{base}/auth/{contract}/verify-token"
-
     try:
-        resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
-        data = resp.json()
-
-        logger.info(f"===== verify-token RESPONSE =====")
-        logger.info(data)
-
-        if not data.get("valid"):
-            return None
-
-        return data.get("user", {}).get("sub")
-
+        data = roble.verify_token(token)
+        user = data.get("user", {})
+        return user.get("sub")     # <-- ID real del usuario
     except Exception as e:
-        logger.error(f"Error en get_user_id(): {e}")
+        logger.error(f"Error get_user_id(): {e}")
         return None
 
 
 # =============================================================
-#   CREAR PROYECTO
+# CREAR PROYECTO
 # =============================================================
 
 @proyectos_blueprint.route("/create", methods=["POST"])
@@ -97,7 +85,7 @@ def crear_proyecto():
 
 
 # =============================================================
-#   LISTAR PROYECTOS DEL USUARIO
+# LISTAR PROYECTOS DEL USUARIO
 # =============================================================
 
 @proyectos_blueprint.route("/mine", methods=["GET"])
@@ -108,7 +96,7 @@ def mis_proyectos():
 
     user_id = get_user_id()
     if not user_id:
-        return jsonify({"error": "No se pudo obtener user_id"}), 401
+        return jsonify({"error": "Token inválido"}), 401
 
     try:
         proyectos = roble.read_records(
@@ -116,15 +104,16 @@ def mis_proyectos():
             filters={"user_id": user_id},
             access_token=token
         )
+        return jsonify({"projects": proyectos}), 200
+
     except Exception as e:
         logger.error(f"❌ Error obteniendo proyectos: {e}")
-        return jsonify({"error": "Error obteniendo proyectos"}), 500
+        return jsonify({"error": "No se pudieron obtener los proyectos"}), 500
 
-    return jsonify({"projects": proyectos}), 200
 
 
 # =============================================================
-#   OBTENER PROYECTO POR ID
+# OBTENER PROYECTO POR ID
 # =============================================================
 
 @proyectos_blueprint.route("/<project_id>", methods=["GET"])
@@ -133,33 +122,32 @@ def get_project(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    proyecto = roble.read_records(
-        "proyectos",
-        filters={"_id": project_id},
-        access_token=token
-    )
+    try:
+        rows = roble.read_records("proyectos", token)
+        match = [p for p in rows if p.get("_id") == project_id]
 
-    if not proyecto:
-        return jsonify({"error": "Proyecto no encontrado"}), 404
+        if not match:
+            return jsonify({"error": "Proyecto no encontrado"}), 404
 
-    return jsonify({"project": proyecto[0]}), 200
+        return jsonify({"project": match[0]}), 200
+
+    except Exception as e:
+        logger.error(f"❌ Error leyendo proyecto: {e}")
+        return jsonify({"error": "No se pudo obtener el proyecto"}), 500
 
 
 # =============================================================
-#   OBTENER CONTENEDOR ASOCIADO
+# OBTENER CONTENEDOR ASOCIADO
 # =============================================================
 
 def get_container(project_id, token):
-    cont = roble.read_records(
-        "containers",
-        filters={"project_id": project_id},
-        access_token=token
-    )
-    return cont[0] if cont else None
+    rows = roble.read_records("containers", token)
+    match = [c for c in rows if c.get("project_id") == project_id]
+    return match[0] if match else None
 
 
 # =============================================================
-#   START CONTAINER
+# START CONTAINER
 # =============================================================
 
 @proyectos_blueprint.route("/start/<project_id>", methods=["POST"])
@@ -168,27 +156,21 @@ def start_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    proyecto = roble.read_records(
-        "proyectos",
-        filters={"_id": project_id},
-        access_token=token
-    )
-
-    if not proyecto or not proyecto[0].get("container_"):
+    container = get_container(project_id, token)
+    if not container:
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = proyecto[0]["container_"]
+    cid = container["container_id"]
 
     try:
         subprocess.check_call(["docker", "start", cid])
-        roble.update_project_status(project_id, "running", cid, token)
-        return jsonify({"success": True})
+        return jsonify({"success": True, "message": "Contenedor iniciado"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error iniciando contenedor: {e}"}), 500
 
 
 # =============================================================
-#   STOP CONTAINER
+# STOP CONTAINER
 # =============================================================
 
 @proyectos_blueprint.route("/stop/<project_id>", methods=["POST"])
@@ -197,27 +179,21 @@ def stop_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    proyecto = roble.read_records(
-        "proyectos",
-        filters={"_id": project_id},
-        access_token=token
-    )
-
-    if not proyecto or not proyecto[0].get("container_"):
+    container = get_container(project_id, token)
+    if not container:
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = proyecto[0]["container_"]
+    cid = container["container_id"]
 
     try:
         subprocess.check_call(["docker", "stop", cid])
-        roble.update_project_status(project_id, "stopped", cid, token)
-        return jsonify({"success": True})
+        return jsonify({"success": True, "message": "Contenedor detenido"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error deteniendo contenedor: {e}"}), 500
 
 
 # =============================================================
-#   LOGS DEL CONTENEDOR
+# LOGS CONTAINER
 # =============================================================
 
 @proyectos_blueprint.route("/logs/<project_id>", methods=["GET"])
@@ -226,19 +202,14 @@ def logs_container(project_id):
     if not token:
         return jsonify({"error": "Token requerido"}), 401
 
-    proyecto = roble.read_records(
-        "proyectos",
-        filters={"_id": project_id},
-        access_token=token
-    )
-
-    if not proyecto or not proyecto[0].get("container_"):
+    container = get_container(project_id, token)
+    if not container:
         return jsonify({"error": "Contenedor no encontrado"}), 404
 
-    cid = proyecto[0]["container_"]
+    cid = container["container_id"]
 
     try:
         logs = subprocess.check_output(["docker", "logs", cid], text=True)
-        return jsonify({"success": True, "logs": logs})
+        return jsonify({"success": True, "logs": logs}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"No se pudieron obtener logs: {e}"}), 500
