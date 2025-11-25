@@ -2,10 +2,11 @@ import os
 from flask import Blueprint, jsonify, send_file
 import zipfile
 from io import BytesIO
+from functools import lru_cache
 
 templates_blueprint = Blueprint("templates", __name__)
 
-# Templates permitidos
+# Templates permitidos (LOS ORIGINALES)
 TEMPLATE_MAP = {
     "flask": "Aplicación Flask",
     "static_template": "Sitio Web Estático",
@@ -13,10 +14,14 @@ TEMPLATE_MAP = {
 }
 
 # Extensiones permitidas
-ALLOWED_EXT = {".html", ".js", ".css", ".json", ".py", ".yml", ".yaml", ".md", ".txt"}
+ALLOWED_EXT = {
+    ".html", ".js", ".css", ".json", ".py",
+    ".yml", ".yaml", ".md", ".txt"
+}
 
-
-def read_files_recursive(base_path):
+# ⭐ LEE LOS ARCHIVOS CON CACHÉ (MUCHO MÁS RÁPIDO)
+@lru_cache(maxsize=None)
+def read_files_recursive_cached(base_path):
     result = {}
 
     for root, _, files in os.walk(base_path):
@@ -30,7 +35,7 @@ def read_files_recursive(base_path):
             try:
                 with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
-            except:
+            except Exception:
                 continue
 
             rel_path = os.path.relpath(full_path, base_path)
@@ -41,8 +46,11 @@ def read_files_recursive(base_path):
 
 @templates_blueprint.route("/api/templates", methods=["GET"])
 def listar_templates():
+    """
+    Devuelve todos los templates con sus archivos.
+    Ahora con lectura cacheada para evitar recargar archivos cada vez.
+    """
     templates_dir = os.path.join(os.getcwd(), "templates")
-
     templates = []
 
     for folder_name, pretty_name in TEMPLATE_MAP.items():
@@ -51,7 +59,7 @@ def listar_templates():
         if not os.path.isdir(folder_path):
             continue
 
-        files = read_files_recursive(folder_path)
+        files = read_files_recursive_cached(folder_path)
 
         templates.append({
             "name": pretty_name,
@@ -62,12 +70,12 @@ def listar_templates():
     return jsonify({"templates": templates})
 
 
-# Descargar template como ZIP
+# Crear ZIP del template
 def zip_directory(folder_path):
     zip_buffer = BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(folder_path):
+        for root, _, files in os.walk(folder_path):
             for file in files:
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, folder_path)
@@ -79,6 +87,10 @@ def zip_directory(folder_path):
 
 @templates_blueprint.route("/api/templates/<template_folder>/download", methods=["GET"])
 def descargar_template(template_folder):
+    """
+    Descarga el ZIP del template.
+    Se mantiene igual al original.
+    """
     base_dir = os.path.join(os.getcwd(), "templates", template_folder)
 
     if not os.path.isdir(base_dir):

@@ -11,9 +11,12 @@ export default function TemplatesList() {
   const navigate = useNavigate();
 
   const ICONS = {
-    "Aplicación Flask": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
-    "Sitio Web Estático": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-    "Aplicación React": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+    "Aplicación Flask":
+      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+    "Sitio Web Estático":
+      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+    "Aplicación React":
+      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
   };
 
   useEffect(() => {
@@ -26,8 +29,8 @@ export default function TemplatesList() {
 
     fetch("/api/templates", {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -45,7 +48,7 @@ export default function TemplatesList() {
     window.location.href = `/api/templates/${folderName}/download`;
   };
 
-  /** ⭐ EJECUTA HIGHLIGHT CUANDO SE ABRE UN <details> */
+  /** ⭐ Ejecuta highlight SOLO cuando se abre el <details> */
   const handleToggle = (e) => {
     if (e.target.open) {
       const blocks = e.target.querySelectorAll("pre code");
@@ -64,7 +67,6 @@ export default function TemplatesList() {
       <div className="templates-container">
         {templates.map((template, index) => (
           <div key={index} className="template-card">
-
             {/* HEADER */}
             <div className="template-header">
               <img src={ICONS[template.name]} className="template-icon" />
@@ -89,12 +91,9 @@ export default function TemplatesList() {
               >
                 <summary className="file-summary">{filename}</summary>
 
+                {/* 👇 AQUÍ ya no usamos highlightAuto en el render */}
                 <pre className="code-snippet">
-                  <code
-                    dangerouslySetInnerHTML={{
-                      __html: hljs.highlightAuto(template.files[filename]).value
-                    }}
-                  ></code>
+                  <code>{template.files[filename]}</code>
                 </pre>
 
                 <button
@@ -109,7 +108,10 @@ export default function TemplatesList() {
         ))}
       </div>
 
-      <button className="btn-small back-btn" onClick={() => navigate("/projects")}>
+      <button
+        className="btn-small back-btn"
+        onClick={() => navigate("/projects")}
+      >
         ← Volver a Mis Proyectos
       </button>
     </div>
