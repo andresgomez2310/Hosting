@@ -1,86 +1,115 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles.css"; // Asegúrate de que el CSS tenga los estilos adecuados
+import "../styles.css";
+
+import hljs from "highlight.js/lib/common";
+import "highlight.js/styles/github-dark.css";
 
 export default function TemplatesList() {
   const [templates, setTemplates] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const ICONS = {
+    "Aplicación Flask": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+    "Sitio Web Estático": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+    "Aplicación React": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg"
+  };
+
   useEffect(() => {
-    const fetchTemplates = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Necesitas iniciar sesión.");
-        navigate("/login");
-        return;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Necesitas iniciar sesión.");
+      navigate("/login");
+      return;
+    }
+
+    fetch("/api/templates", {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-
-      try {
-        const response = await fetch("http://localhost:5000/api/templates", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al obtener los templates.");
-        }
-
-        const data = await response.json();
-        setTemplates(data.templates); // Asumiendo que la respuesta contiene un arreglo de templates
-      } catch (error) {
-        setError("Hubo un problema al obtener los templates.");
-        console.error("Error fetching templates:", error);
-      }
-    };
-
-    fetchTemplates();
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setTemplates(data.templates || []);
+      })
+      .catch(() => setError("Error al cargar los templates"));
   }, [navigate]);
 
-  // Función para copiar el código
-  const copyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    alert("¡Código copiado al portapapeles!");
+  const copyCode = (content, filename) => {
+    navigator.clipboard.writeText(content);
+    alert(`Contenido de ${filename} copiado`);
+  };
+
+  const downloadZip = (folderName) => {
+    window.location.href = `/api/templates/${folderName}/download`;
+  };
+
+  /** ⭐ EJECUTA HIGHLIGHT CUANDO SE ABRE UN <details> */
+  const handleToggle = (e) => {
+    if (e.target.open) {
+      const blocks = e.target.querySelectorAll("pre code");
+      blocks.forEach((block) => {
+        hljs.highlightElement(block);
+      });
+    }
   };
 
   return (
     <div className="templates-page">
-      <h1 className="templates-title">Templates Disponibles</h1>
+      <h1 className="templates-title">📦 Templates Disponibles</h1>
 
       {error && <p className="error-text">{error}</p>}
 
-      {templates.length === 0 ? (
-        <p>No hay templates disponibles.</p>
-      ) : (
-        <div className="templates-container">
-          {templates.map((template, index) => (
-            <div key={index} className="template-card">
-              <h3>{template.name}</h3>
-              <p>{template.description}</p>
+      <div className="templates-container">
+        {templates.map((template, index) => (
+          <div key={index} className="template-card">
 
-              {/* Mostrar el código de cada template */}
-              <div className="template-content">
-                <h4>Archivos necesarios:</h4>
-                <pre className="code-snippet">{template.code}</pre> {/* Aquí usamos el campo 'code' que contiene el código del template */}
-                <button 
-                  className="copy-btn"
-                  onClick={() => copyCode(template.code)}
-                >
-                  Copiar código
-                </button>
-              </div>
+            {/* HEADER */}
+            <div className="template-header">
+              <img src={ICONS[template.name]} className="template-icon" />
+              <h2>{template.name}</h2>
+
+              <button
+                className="download-btn"
+                onClick={() => downloadZip(template.folder)}
+              >
+                📥 Descargar ZIP
+              </button>
             </div>
-          ))}
-        </div>
-      )}
 
-      <button
-        className="btn-small back-btn"
-        onClick={() => navigate("/projects")}
-      >
+            {/* LISTA DE ARCHIVOS */}
+            <h4>Archivos del template:</h4>
+
+            {Object.keys(template.files).map((filename, idx) => (
+              <details
+                key={idx}
+                className="file-details animated"
+                onToggle={handleToggle}
+              >
+                <summary className="file-summary">{filename}</summary>
+
+                <pre className="code-snippet">
+                  <code
+                    dangerouslySetInnerHTML={{
+                      __html: hljs.highlightAuto(template.files[filename]).value
+                    }}
+                  ></code>
+                </pre>
+
+                <button
+                  className="copy-btn"
+                  onClick={() => copyCode(template.files[filename], filename)}
+                >
+                  Copiar {filename}
+                </button>
+              </details>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <button className="btn-small back-btn" onClick={() => navigate("/projects")}>
         ← Volver a Mis Proyectos
       </button>
     </div>

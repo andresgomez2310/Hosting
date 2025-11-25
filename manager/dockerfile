@@ -1,31 +1,16 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Configuración básica
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copiar requirements e instalarlos
+# copiar requirements primero para cache
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el código del manager
+# copiar TODO el proyecto, incluyendo templates
 COPY . .
 
-# Variables de entorno necesarias por Roble
-ENV ROBLE_URL="https://roble-api.openlab.uninorte.edu.co"
-ENV ROBLE_CONTRACT="hosting_adcce8f544"
+# asegurar permisos
+RUN chmod -R 755 /app
 
-# Exponer puerto interno 5000
-EXPOSE 5000
-
-# Ejecutar manager.py con gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "manager:app"]
+CMD ["gunicorn", "manager:app", "--bind", "0.0.0.0:5000"]

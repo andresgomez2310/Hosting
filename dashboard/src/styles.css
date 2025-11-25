@@ -66,7 +66,7 @@ input:focus {
 }
 
 .btn:hover {
-  background: #240250;
+  background: #3a067c;
 }
 
 .btn-small {
@@ -80,15 +80,16 @@ input:focus {
 }
 
 .btn-small:hover {
-  background: #dcc7fe;
+  background: #d4d4ff;
 }
 
-/* ======= Sidebar y Botón de colapsar ======= */
+/* =========================================
+   SIDEBAR
+========================================= */
 .sidebar {
   width: 220px;
-  background: rgba(48, 2, 107, 0.932);
+  background: rgba(48, 2, 107, 0.93);
   color: white;
-  backdrop-filter: blur(6px);
   min-height: 100vh;
   padding: 20px;
   padding-top: 30px;
@@ -105,7 +106,7 @@ input:focus {
   background: rgba(65, 13, 114, 0.35);
 }
 
-/* Estilo del botón para colapsar */
+/* Collapse button */
 .collapse-btn {
   background: #260453;
   border: none;
@@ -122,8 +123,7 @@ input:focus {
 }
 
 .collapse-btn:hover {
-  background: #240250;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  background: #4a0ca3;
 }
 
 .sidebar-item {
@@ -140,7 +140,7 @@ input:focus {
 }
 
 .sidebar-item:hover {
-  background: #2a025e;
+  background: #2f0372;
 }
 
 .label {
@@ -154,9 +154,9 @@ input:focus {
   overflow: hidden;
 }
 
-/* Ajustes de logout */
+/* Logout button */
 .sidebar-logout {
-  background: #dc26268f;
+  background: #d63636;
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
@@ -166,20 +166,17 @@ input:focus {
 }
 
 .sidebar-logout:hover {
-  background: #a71cb9;
+  background: #b02121;
 }
 
-
 /* =========================================
-   MAIN CONTENT AREA
+   MAIN CONTENT
 ========================================= */
 .main-content {
   margin-left: 220px;
   padding: 50px 40px;
   width: calc(100% - 220px);
   min-height: 100vh;
-  overflow: visible;
-  padding-bottom: 80px;
 }
 
 .main-content.collapsed {
@@ -248,7 +245,7 @@ input:focus {
    TEMPLATE LIST
 ========================================= */
 .templates-page {
-  max-width: 1200px;   /* ⬅ Más ancho */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -260,14 +257,13 @@ input:focus {
   margin-bottom: 25px;
 }
 
-/* Contenedor de templates en columna */
 .templates-container {
   display: flex;
   flex-direction: column;
   gap: 25px;
 }
 
-/* TARJETA DE TEMPLATE */
+/* Template Card */
 .template-card {
   background: #fff;
   padding: 28px;
@@ -281,109 +277,77 @@ input:focus {
   box-shadow: 0 8px 28px rgba(0,0,0,0.12);
 }
 
-.template-card h3 {
+.template-card h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #510dbe;
+  color: #35097c;
 }
 
-.template-card p {
-  font-size: 15px;
-  color: #614769;
-  margin: 12px 0;
-}
-
-/* =========================================
-   TEMPLATE LIST STYLING
-========================================= */
-.templates-page {
-  max-width: 1200px;   /* ⬅ Más ancho */
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.templates-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #39067c;
-  margin-bottom: 25px;
-}
-
-/* Contenedor de templates en columna */
-.templates-container {
+/* HEADER ICON + TITLE + ZIP BUTTON */
+.template-header {
   display: flex;
-  flex-direction: column;
-  gap: 25px;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.template-card {
-  background: #fff;
-  padding: 28px;
-  border-radius: 14px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.1);
-  transition: transform .2s, box-shadow .2s;
+.template-icon {
+  width: 45px;
+  height: 45px;
+  margin-right: 10px;
 }
 
-.template-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-}
-
-.template-card h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #39067c;
-}
-
-.template-card p {
-  font-size: 15px;
-  color: #574769;
-  margin: 12px 0;
-}
-
-/* =========================================
-   TEMPLATE CONTENT — ESTILO PRO
-========================================= */
-.template-content {
-  margin-top: 20px;
-  background: white;
-  padding: 20px 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 14px rgba(0,0,0,0.1);
-}
-
-.template-content h4 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #39067c;
-  margin-bottom: 10px;
-}
-
-/* Caja de código estilo VSCode */
-.code-snippet {
-  background: #220f2a;
-  padding: 16px;
-  border-radius: 10px;
-  color: #e2e8f0;
-  font-family: Consolas, monospace;
-  white-space: pre-wrap;
-  margin: 12px 0;
-  overflow-x: auto;
-  line-height: 1.4;
-}
-
-/* Botón copiar */
-.copy-btn {
-  background: #39067c;
+.download-btn {
+  background: #4a00c8;
   color: white;
-  padding: 8px 18px;
-  border: none;
+  padding: 8px 14px;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  border: none;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.download-btn:hover {
+  background: #35008a;
+}
+
+/* FILE LIST + CODE */
+.file-details summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.file-details.animated[open] {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code block */
+.code-snippet {
+  background: #0d1117;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+/* Copy button */
+.copy-btn {
+  background: #8338ec;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  cursor: pointer;
+  border: none;
 }
 
 .copy-btn:hover {
-  background: #39067c;
+  background: #5a16b3;
 }
