@@ -18,7 +18,7 @@ class ActivityMonitor:
         )
         self.contract = os.getenv(
             "ROBLE_CONTRACT",
-            "pc2_394e10a6d2"  # default: el contrato que dijiste
+            "pc2_394e10a6d2"  
         )
 
     # ======================================================

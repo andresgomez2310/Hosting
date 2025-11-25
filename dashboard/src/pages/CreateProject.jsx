@@ -31,7 +31,6 @@ export default function CreateProject() {
     }
 
     try {
-      // 🔥 createProject SOLO recibe estos dos parámetros
       const res = await createProject(name, repoUrl);
 
       if (res?.success) {
@@ -68,6 +67,48 @@ export default function CreateProject() {
         />
         <small>El repositorio debe contener un Dockerfile</small>
       </div>
+
+      {/* =======================================================
+          🔥 BLOQUE A LA FUERZA — NO DEPENDE DE TU CSS
+          SI ESTO NO SE VE ► tu layout NO está renderizando este componente
+      ========================================================== */}
+      <div style={{
+        marginTop: "25px",
+        padding: "15px",
+        borderRadius: "10px",
+        border: "3px solid red",
+        background: "#fff7cc",
+        color: "#000",
+        textAlign: "left"
+      }}>
+        <h3 style={{ marginBottom: "10px" }}>
+          📦 ¿No tienes un repositorio aún?
+        </h3>
+
+        <p style={{ marginBottom: "8px", fontWeight: "bold" }}>
+          Templates disponibles:
+        </p>
+
+        {/* Enlace a los templates dinámicamente */}
+        <a
+          href="/templates"  // Ahora redirige a /templates, que es el enlace de la lista de templates.
+          target="_blank"
+          style={{
+            display: "inline-block",
+            color: "#2563eb",
+            marginBottom: "10px",
+            fontWeight: "bold"
+          }}
+        >
+          → Ver templates listos
+        </a>
+
+        <p style={{ fontSize: "14px", color: "#444" }}>
+          Incluyen Dockerfile + estructura base para desplegar rápido.
+        </p>
+      </div>
+
+      {/* ======================================================= */}
 
       {error && <p className="error-text">{error}</p>}
 

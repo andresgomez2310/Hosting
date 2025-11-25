@@ -6,7 +6,7 @@ import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ProjectList from "./pages/ProjectList.jsx";
 import CreateProject from "./pages/CreateProject.jsx";
-
+import TemplatesList from "./pages/TemplatesList.jsx";
 // Components
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Layout from "./components/Layout.jsx";
@@ -31,6 +31,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        
 
         {/* === DASHBOARD === */}
         <Route
@@ -68,6 +69,17 @@ export default function App() {
           }
         />
 
+        {/* === TEMPLATES LIST === */}
+        <Route
+          path="/templates"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TemplatesList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
