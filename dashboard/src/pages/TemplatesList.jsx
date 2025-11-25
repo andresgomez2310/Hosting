@@ -47,8 +47,8 @@ export default function TemplatesList() {
   };
 
   return (
-    <div className="card">
-      <h1 className="title">Templates Disponibles</h1>
+    <div className="templates-page">
+      <h1 className="templates-title">Templates Disponibles</h1>
 
       {error && <p className="error-text">{error}</p>}
 
@@ -66,7 +66,7 @@ export default function TemplatesList() {
                 <h4>Archivos necesarios:</h4>
                 <pre className="code-snippet">{template.code}</pre> {/* Aquí usamos el campo 'code' que contiene el código del template */}
                 <button 
-                  className="btn-small copy-btn"
+                  className="copy-btn"
                   onClick={() => copyCode(template.code)}
                 >
                   Copiar código
