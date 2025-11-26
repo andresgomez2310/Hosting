@@ -50,6 +50,8 @@ Una vez que los contenedores estén arriba, abre en tu navegador:
 ```
 http://localhost/login
 ```
+```
+
 ## 4️⃣ Acceder a la aplicación
 ## 🧩 Informe
 Este informe presenta la arquitectura, el funcionamiento y las estrategias implementadas en la plataforma de hosting académico basada en Docker, junto con la participación de cada integrante del equipo en su desarrollo.
