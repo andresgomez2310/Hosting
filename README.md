@@ -13,7 +13,7 @@ cd Hosting
 
 ---
 
-## 2️⃣ Crear el archivo `.env` dentro de /manager
+## 2️⃣ Crear el archivo `.env` dentro de la carpeta root
 
 Dentro de la carpeta root, crea un archivo llamado:
 
