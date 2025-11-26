@@ -17,3 +17,8 @@ itsdangerous==2.1.2
 
 # --- Logs y debugging ---
 rich==13.7.0
+
+# --- Flask + Docker ---
+Flask>=2.0
+docker>=5.0.0
+requests>=2.25
