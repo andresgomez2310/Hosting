@@ -72,7 +72,7 @@ https://youtu.be/_OEFWZLXy30
 ```
 ## Link Repositorios Templates
 
-https://github.com/Znake-G/flask-template
-https://github.com/Znake-G/static-template
-https://github.com/Znake-G/react_template
+- https://github.com/Znake-G/flask-template
+- https://github.com/Znake-G/static-template
+- https://github.com/Znake-G/react_template
 ```
