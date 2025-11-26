@@ -64,7 +64,15 @@ Este informe presenta la arquitectura, el funcionamiento y las estrategias imple
 El siguiente diagrama resume la arquitectura general de la plataforma, mostrando la interacción entre el dashboard, el backend, el reverse proxy y los contenedores Docker desplegados para cada proyecto.
 
 ![Diagrama de Arquitectura](./diagrama.jpg)
-
+```
 ## Link de Youtube
 
 https://youtu.be/_OEFWZLXy30
+
+```
+## Link Repositorios Templates
+
+https://github.com/Znake-G/flask-template
+https://github.com/Znake-G/static-template
+https://github.com/Znake-G/react_template
+```

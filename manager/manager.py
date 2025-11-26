@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory, abort
 from flask_cors import CORS
 from templates_routes import templates_blueprint
 from auth_routes import auth_blueprint
@@ -24,8 +24,6 @@ def health():
         "message": "Manager funcionando correctamente"
     }
 
-
-
 # 🎨 Nombres bonitos
 TEMPLATE_INFO = {
     "flask": {
@@ -36,7 +34,8 @@ TEMPLATE_INFO = {
             "docker-compose.yml",
             "app.py",
             "requirements.txt"
-        ]
+        ],
+        "repo": "https://github.com/Znake-G/flask-template.git"
     },
     "static_template": {
         "title": "Sitio Web Estático",
@@ -45,7 +44,8 @@ TEMPLATE_INFO = {
             "Dockerfile",
             "docker-compose.yml",
             "index.html"
-        ]
+        ],
+        "repo": "https://github.com/Znake-G/static-template.git"
     },
     "template_react": {
         "title": "Aplicación React",
@@ -59,7 +59,8 @@ TEMPLATE_INFO = {
             "src/App.css",
             "src/index.js",
             "src/index.css"
-        ]
+        ],
+        "repo": "https://github.com/Znake-G/react_template.git"
     }
 }
 
@@ -101,6 +102,57 @@ def get_templates():
         })
 
     return jsonify({"templates": result})
+
+
+# Preview estático de templates (sin docker extra)
+@app.route("/preview/<folder>/", defaults={"path": "index.html"})
+@app.route("/preview/<folder>/<path:path>")
+def preview_template(folder, path):
+	"""
+	Serve a preview for a template folder located at manager/templates/<folder>/
+	Search order: build, dist, public, root. If requested file exists serve it,
+	otherwise return index.html (SPA support). If no index.html found, render
+	a minimal HTML listing files + repo link.
+	"""
+	base_dir = os.path.join(os.path.dirname(__file__), "templates", folder)
+	candidates = ["build", "dist", "public", ""]  # order to check
+	for c in candidates:
+		root = os.path.join(base_dir, c) if c else base_dir
+		index_file = os.path.join(root, "index.html")
+		if os.path.isdir(root) and os.path.exists(index_file):
+			# if requested path exists, serve it; else serve index.html
+			requested = os.path.join(root, path)
+			if os.path.exists(requested) and os.path.isfile(requested):
+				return send_from_directory(root, path)
+			return send_from_directory(root, "index.html")
+
+	# Si llegamos aquí: no hay index en los lugares esperados.
+	# Si el folder existe, listar archivos y mostrar enlace al repo si existe.
+	if os.path.isdir(base_dir):
+		# construir listado simple
+		items = []
+		for root_dir, dirs, files in os.walk(base_dir):
+			rel = os.path.relpath(root_dir, base_dir)
+			for f in files:
+				items.append(os.path.join(rel if rel != "." else "", f))
+		# obtener repo si está definido en TEMPLATE_INFO
+		repo = TEMPLATE_INFO.get(folder, {}).get("repo", "")
+		html = ["<html><head><meta charset='utf-8'><title>Preview - {}</title></head><body>".format(folder)]
+		html.append("<h1>Preview mínimo: {}</h1>".format(folder))
+		if repo:
+			html.append('<p>Repo: <a href="{}" target="_blank" rel="noopener noreferrer">{}</a></p>'.format(repo, repo))
+		if items:
+			html.append("<h3>Archivos:</h3><ul>")
+			for it in sorted(items):
+				html.append("<li>{}</li>".format(it))
+			html.append("</ul>")
+		else:
+			html.append("<p>No hay archivos detectados en este template.</p>")
+		html.append("</body></html>")
+		return ("".join(html), 200, {"Content-Type": "text/html; charset=utf-8"})
+
+	# no se encontró el template
+	abort(404)
 
 
 if __name__ == "__main__":
