@@ -2,4 +2,10 @@ FROM nginx:alpine
 
 RUN rm -rf /etc/nginx/conf.d/*
 
+# instalar curl si es necesario para debugging dentro del contenedor
+RUN apk add --no-cache curl
+
+# copiar la configuración principal del proxy
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# NOTE: no COPY idle-watcher.sh here — idle-watcher not used in this setup

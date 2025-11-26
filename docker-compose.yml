@@ -16,6 +16,14 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+    # permitir que manager controle Docker y escriba configs nginx (solo projects)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./nginx/conf.d/projects:/nginx-conf/projects
+    restart: unless-stopped
+    environment:
+      - PROJECT_CPU=0.5
+      - PROJECT_MEM=512m
 
   dashboard:
     build: ./dashboard
@@ -43,6 +51,10 @@ services:
       - hosting_net
     ports:
       - "80:80"
+    # montar solo la config base y la carpeta de proyectos (no sobreescribir default.conf)
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/conf.d/projects:/etc/nginx/conf.d/projects
     command: >
       sh -c "
         echo '🚀 HOSTING INICIADO';

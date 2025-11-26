@@ -2,12 +2,20 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# instalar git y herramientas necesarias para builds
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    ca-certificates \
+    curl && \
+    rm -rf /var/lib/apt/lists/*
+
 # copiar requirements primero para cache
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copiar TODO el proyecto, incluyendo templates
+# copiar TODO el proyecto, incluyendo manager app
 COPY . .
 
 # asegurar permisos
