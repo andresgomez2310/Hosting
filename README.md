@@ -1,8 +1,14 @@
-#Documento
+##Documento
+Este informe presenta la arquitectura, el funcionamiento y las estrategias implementadas en la plataforma de hosting académico basada en Docker, junto con la participación de cada integrante del equipo en su desarrollo.
+
 [📄 Ver Informe Técnico (PDF)](./Hosting%20(1).pdf)
 
-#Diagrama
-[Ver diagrama](./diagrama.jpg)
+## 🧩 Diagrama de Arquitectura
+
+El siguiente diagrama resume la arquitectura general de la plataforma, mostrando la interacción entre el dashboard, el backend, el reverse proxy y los contenedores Docker desplegados para cada proyecto.
+
+![Diagrama de Arquitectura](./diagrama.jpg)
+
 
 # Cómo ejecutar el proyecto Hosting
 
