@@ -45,13 +45,13 @@ services:
       - "80:80"
     command: >
       sh -c "
-        echo '🚀 HOSTING INICIADO';
-        echo '📍 ACCESO A DASHBOARD: http://localhost';
-        echo '📍 ACCESO A MANAGER: http://localhost/api';
-        echo '📍 AUTH: http://localhost/auth';
-        echo '📍 PROJECTS: http://localhost/projects';
+        echo ' HOSTING INICIADO';
+        echo ' ACCESO A DASHBOARD: http://localhost';
+        echo ' ACCESO A MANAGER: http://localhost/api';
+        echo ' AUTH: http://localhost/auth';
+        echo ' PROJECTS: http://localhost/projects';
         echo '';
-        echo '⏳ Esperando servicios (timeout ~30s cada uno)...';
+        echo ' Esperando servicios (timeout ~30s cada uno)...';
         i=0;
         until curl -sSf http://dashboard:3000 >/dev/null 2>&1 || [ \$i -ge 30 ]; do
           i=\$((i+1));
