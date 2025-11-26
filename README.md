@@ -1,3 +1,6 @@
+#Documento y diagrama
+[📄 Ver Informe Técnico (PDF)](./Hosting%20(1).pdf)
+
 # Cómo ejecutar el proyecto Hosting
 
 Sigue estos pasos para correr el proyecto en cualquier computador con Docker instalado.
