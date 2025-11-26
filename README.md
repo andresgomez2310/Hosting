@@ -45,6 +45,11 @@ Esto descargará las imágenes necesarias, construirá el frontend, backend y pr
 
 ---
 
+Una vez que los contenedores estén arriba, abre en tu navegador:
+
+```
+http://localhost/login
+```
 ## 4️⃣ Acceder a la aplicación
 ## 🧩 Informe
 Este informe presenta la arquitectura, el funcionamiento y las estrategias implementadas en la plataforma de hosting académico basada en Docker, junto con la participación de cada integrante del equipo en su desarrollo.
@@ -56,9 +61,3 @@ Este informe presenta la arquitectura, el funcionamiento y las estrategias imple
 El siguiente diagrama resume la arquitectura general de la plataforma, mostrando la interacción entre el dashboard, el backend, el reverse proxy y los contenedores Docker desplegados para cada proyecto.
 
 ![Diagrama de Arquitectura](./diagrama.jpg)
-
-Una vez que los contenedores estén arriba, abre en tu navegador:
-
-```
-http://localhost/login
-```
