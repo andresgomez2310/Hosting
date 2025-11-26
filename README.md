@@ -1,5 +1,6 @@
 #Documento y diagrama
 [📄 Ver Informe Técnico (PDF)](./Hosting%20(1).pdf)
+[Ver diagrama](./diagrama.jpg)
 
 # Cómo ejecutar el proyecto Hosting
 
