@@ -1,4 +1,4 @@
-##Documento
+## 🧩 Informe
 Este informe presenta la arquitectura, el funcionamiento y las estrategias implementadas en la plataforma de hosting académico basada en Docker, junto con la participación de cada integrante del equipo en su desarrollo.
 
 [📄 Ver Informe Técnico (PDF)](./Hosting%20(1).pdf)
