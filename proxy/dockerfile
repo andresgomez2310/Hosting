@@ -3,3 +3,10 @@ FROM nginx:alpine
 RUN rm -rf /etc/nginx/conf.d/*
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# NO COPIAR templates-inject.js (la SPA gestiona los botones)
+# COPY templates-inject.js /usr/share/nginx/html/templates-inject.js
+
+# Copiar script de espera y arrancado (evita problemas de quoting en docker-compose)
+COPY wait-and-run.sh /usr/local/bin/wait-and-run.sh
+RUN chmod +x /usr/local/bin/wait-and-run.sh

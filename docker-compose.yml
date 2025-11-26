@@ -43,28 +43,7 @@ services:
       - hosting_net
     ports:
       - "80:80"
-    command: >
-      sh -c "
-        echo ' HOSTING INICIADO';
-        echo ' ACCESO A DASHBOARD: http://localhost';
-        echo ' ACCESO A MANAGER: http://localhost/api';
-        echo ' AUTH: http://localhost/auth';
-        echo ' PROJECTS: http://localhost/projects';
-        echo '';
-        echo ' Esperando servicios (timeout ~30s cada uno)...';
-        i=0;
-        until curl -sSf http://dashboard:3000 >/dev/null 2>&1 || [ \$i -ge 30 ]; do
-          i=\$((i+1));
-          echo \"esperando dashboard... (\$i)\"; sleep 1;
-        done;
-        i=0;
-        until curl -sSf http://manager:5000 >/dev/null 2>&1 || [ \$i -ge 30 ]; do
-          i=\$((i+1));
-          echo \"esperando manager... (\$i)\"; sleep 1;
-        done;
-        echo '➡️ Iniciando nginx (si los servicios responden, de lo contrario nginx arrancará igual)...';
-        nginx -g 'daemon off;'
-      "
+    command: ["/usr/local/bin/wait-and-run.sh"]
 
 networks:
   hosting_net:

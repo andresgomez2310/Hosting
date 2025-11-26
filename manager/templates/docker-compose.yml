@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  flask:
+    build: ./flask
+    container_name: flask_template
+    networks:
+      hosting_net:
+        aliases:
+          - flask_template
+          - flask-template
+    expose:
+      - "5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  template_react:
+    build:
+      context: ../../
+      dockerfile: manager/templates/template_react/Dockerfile
+    container_name: react_template
+    networks:
+      hosting_net:
+        aliases:
+          - react_template
+          - react-template
+          - template_react
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  static_template:
+    build: ./static_template
+    container_name: node_template
+    networks:
+      hosting_net:
+        aliases:
+          - node_template
+          - node-template
+          - static_template
+          - static-template
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  hosting_net:
+    external: true
