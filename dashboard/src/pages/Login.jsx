@@ -11,73 +11,59 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Limpiar cualquier error anterior
-
-    console.group("%c🔵 LOGIN FLOW", "color: #2563eb");
-
-    console.log("→ Intentando iniciar sesión…");
-    console.log("Email usado:", email);
+    setError("");
 
     try {
-      // Llamar a la función de login (desde api.js)
       const res = await login(email, password);
 
-      console.log("Respuesta del backend:", res);
-
       if (res.success) {
-        console.log("✔ Login exitoso");
-        console.log("AccessToken recibido:", res.accessToken);
-
-        // Guardar el token en localStorage
         localStorage.setItem("token", res.accessToken);
-
-        console.log("→ Enviando token al monitor…");
-        const monitorResponse = await sendTokenToMonitor(res.accessToken); // Enviar el token al monitor
-        console.log("Monitor respondió:", monitorResponse);
-
-        console.log("✔ Redirigiendo al Dashboard…");
-        navigate("/dashboard"); // Redirigir al Dashboard
+        await sendTokenToMonitor(res.accessToken);
+        navigate("/dashboard");
       } else {
-        console.warn("❌ Login fallido:", res.message);
         setError(res.message || "Credenciales inválidas");
       }
     } catch (err) {
-      console.error("⚠ Error de red:", err);
       setError("Error de red al intentar iniciar sesión.");
     }
-
-    console.groupEnd();
   };
 
   return (
-    <div className="card">
-      <h1>Iniciar sesión</h1>
+    <div className="center-screen">
+      <div className="dashboard-hero-card login-hero-card">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <h1 className="hero-title">Hosting Platform</h1>
+        <p className="hero-subtitle">Tu base digital para el éxito en línea</p>
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <h2 className="login-title">Iniciar sesión</h2>
 
-        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        <button className="btn" type="submit">Entrar</button>
-      </form>
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-      <p style={{ marginTop: "20px" }}>
-        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-      </p>
+          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+
+          <button className="btn" type="submit">Entrar</button>
+        </form>
+
+        <p style={{ marginTop: "20px" }}>
+          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+        </p>
+
+      </div>
     </div>
   );
 }

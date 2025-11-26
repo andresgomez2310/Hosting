@@ -14,9 +14,18 @@ export default function Sidebar() {
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       
       {/* BOTÓN DE COLAPSAR */}
-      <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
+      <button
+        className="collapse-btn"
+        onClick={() => {
+          if (!collapsed) {
+            navigate(-1); // ← Ir a la página anterior
+          }
+          setCollapsed(!collapsed);
+        }}
+      >
         {collapsed ? "→" : "←"}
       </button>
+
 
       {/* LINKS */}
       <div className="sidebar-links">
@@ -39,7 +48,7 @@ export default function Sidebar() {
       {/* LOGOUT */}
       <button className="sidebar-logout" onClick={logout}>
         <span className="icon">🚪</span>
-        {!collapsed && <span className="label">Cerrar sesión</span>}
+        {!collapsed && <span className="label">Cerrar Sesión</span>}
       </button>
 
     </div>

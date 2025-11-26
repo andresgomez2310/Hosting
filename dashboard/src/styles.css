@@ -17,15 +17,30 @@ body {
    BASIC CARDS & INPUTS
 ========================================= */
 .card {
-  width: 420px;
-  background: #fff;
-  padding: 32px;
-  max-width: 1200px;
-  border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  width: 480px;
+  background: #ffffff;
+  padding: 40px 48px;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   text-align: center;
   margin: auto;
+
+  /* NUEVO: efecto suave */
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.4s ease;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .card h1 {
   font-size: 26px;
@@ -156,18 +171,23 @@ input:focus {
 
 /* Logout button */
 .sidebar-logout {
-  background: #d63636;
+  background: #550eb1c0;  /* Igual que otros botones */
   padding: 12px;
   border-radius: 10px;
   cursor: pointer;
   color: white;
   display: flex;
+  align-items: center;
   gap: 12px;
+  width: 100%;
+  transition: 0.2s;
+  border: none;
 }
 
 .sidebar-logout:hover {
-  background: #b02121;
+  background: #2f0372;
 }
+
 
 /* =========================================
    MAIN CONTENT
@@ -209,7 +229,7 @@ input:focus {
 }
 
 .error-text {
-  color: #dc2626;
+  color: #561e8a;
   font-weight: bold;
   margin-bottom: 8px;
 }
@@ -419,3 +439,339 @@ input:focus {
   font-size: 14px;
   font-weight: 600;
 }
+/* Contenedor que centra la tarjeta de login */
+.center-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 18px;
+  background: #ede9fe;
+  color: #3b0ca3;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-back:hover {
+  background: #ddd6fe;
+  transform: translateY(-2px);
+}
+.btn-back {
+  margin-top: 26px;
+}
+
+.dashboard-hero-card {
+  width: 900px;
+  padding: 60px 80px;
+  border-radius: 26px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(155, 102, 234, 0.30),
+    rgba(255, 255, 255, 0.95)
+  );
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0px 25px 50px rgba(0, 0, 0, 0.12);
+
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+
+.dashboard-card {
+  width: 550px;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+.dashboard-buttons {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* separación */
+  align-items: center;
+}
+.dashboard-btn {
+  width: 70%;
+  padding: 14px;
+  font-size: 17px;
+  text-align: center;
+  background: #240250;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.dashboard-btn:hover {
+  background: #3b0b88;
+  transform: translateY(-2px);
+}
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;  /* ← separación vertical */
+  margin-top: 40px;
+}
+.hero-box {
+  width: 850px;
+  padding: 40px;
+  background: white;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0px 25px 40px rgba(0,0,0,0.12);
+  margin-bottom: 40px;
+  animation: fadeIn 0.5s ease;
+}
+.hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #2d036f;
+  margin-bottom: 8px;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  color: #6b5c87;
+  margin-bottom: 40px;
+}
+
+.hero-services {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+.service-card {
+  width: 190px;
+  padding: 18px;
+  background: #f7f1ff;
+  border-radius: 16px;
+  box-shadow: 0px 10px 25px rgba(147, 84, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+}
+
+.service-icon {
+  font-size: 30px;
+}
+
+.service-text {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #2d036f;
+}
+.hero-button {
+  margin-top: 32px;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4b0fa8, #240250);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.hero-button:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #6517e0, #32036d);
+}
+.dashboard-primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: 260px;
+  margin: 0 auto 30px auto;
+
+  background: #b78cff;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+
+  box-shadow: 0px 10px 35px rgba(123, 64, 255, 0.25);
+
+  transition: all 0.2s ease;
+}
+
+.dashboard-primary-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 15px 40px rgba(123, 64, 255, 0.4);
+}
+
+.dash-icon {
+  font-size: 22px;
+}
+
+.dashboard-secondary-btn {
+  display: block;
+  width: 300px;
+  margin: 0 auto;
+
+  padding: 15px 20px;
+
+  background: linear-gradient(135deg, #4b0fa8, #240250);
+  color: white;
+
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+
+  border-radius: 14px;
+
+  box-shadow: 0px 10px 30px rgba(36, 2, 80, 0.4);
+  transition: all 0.25s ease;
+}
+
+.dashboard-secondary-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 15px 35px rgba(36, 2, 80, 0.55);
+}
+
+@keyframes sidebarBounce {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+.sidebar-item {
+  transition: all 0.25s ease;
+}
+
+.sidebar-item:hover {
+  animation: sidebarBounce 0.35s ease;
+  box-shadow: 0px 6px 20px rgba(80, 0, 140, 0.25);
+  transform: translateY(-2px);
+}
+.sidebar-logout {
+  transition: all 0.25s ease;
+}
+
+.sidebar-logout:hover {
+  animation: sidebarBounce 0.35s ease;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 20px rgba(80, 0, 140, 0.25);
+}
+.collapse-btn {
+  transition: all 0.25s ease;
+}
+
+.collapse-btn:hover {
+  animation: sidebarBounce 0.35s ease;
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.dashboard-hero-card {
+  width: 900px;
+  padding: 60px 80px;
+  border-radius: 26px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(155, 102, 234, 0.30),
+    rgba(255, 255, 255, 0.95)
+  );
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0px 25px 50px rgba(0, 0, 0, 0.12);
+
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.login-hero-card {
+  width: 720px !important;
+  padding: 50px 60px !important;
+}
+.dashboard-hero-card {
+  width: 900px;
+  padding: 60px 80px;
+  border-radius: 26px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(155, 102, 234, 0.30),
+    rgba(255, 255, 255, 0.95)
+  );
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0px 25px 50px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+.login-hero-card {
+  width: 720px !important;
+  padding: 50px 60px !important;
+}
+.hero-title {
+  font-size: 42px;
+  font-weight: 800;
+  color: #2d036f;
+}
+
+.hero-subtitle {
+  margin-top: 5px;
+  font-size: 18px;
+  color: #6b5c87;
+}
+
+.login-title {
+  margin-top: 40px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #3a0ca3;
+}
+.login-form input {
+  margin-top: 14px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid #dbeafe;
+  font-size: 15px;
+  background: rgba(255,255,255,0.75);
+}
+.btn-back {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 10px 18px;
+  background: #ede9fe;
+  color: #3a0ca3;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  background: #dcd2ff;
+}
+
+
+
+
+
+
