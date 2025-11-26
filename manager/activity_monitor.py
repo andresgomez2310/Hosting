@@ -87,3 +87,4 @@ class ActivityMonitor:
 
 # Instancia global
 monitor = ActivityMonitor()
+

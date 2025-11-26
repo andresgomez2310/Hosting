@@ -10,6 +10,12 @@ services:
       - "5000:5000"
     networks:
       - hosting_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   dashboard:
     build: ./dashboard
@@ -18,8 +24,14 @@ services:
       - hosting_net
     environment:
       - DEBUG=true
-    command: >
-      sh -c "echo '🌐 Dashboard corriendo internamente en http://dashboard:80'; nginx -g 'daemon off;'"
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   proxy:
     build: ./proxy
@@ -31,14 +43,27 @@ services:
       - hosting_net
     ports:
       - "80:80"
-    entrypoint: >
-      /bin/sh -c "
-        echo '⏳ Esperando a que Dashboard esté listo...';
-        while ! curl -s http://dashboard:80/index.html; do
-          sleep 2;
+    command: >
+      sh -c "
+        echo '🚀 HOSTING INICIADO';
+        echo '📍 ACCESO A DASHBOARD: http://localhost';
+        echo '📍 ACCESO A MANAGER: http://localhost/api';
+        echo '📍 AUTH: http://localhost/auth';
+        echo '📍 PROJECTS: http://localhost/projects';
+        echo '';
+        echo '⏳ Esperando servicios (timeout ~30s cada uno)...';
+        i=0;
+        until curl -sSf http://dashboard:3000 >/dev/null 2>&1 || [ \$i -ge 30 ]; do
+          i=\$((i+1));
+          echo \"esperando dashboard... (\$i)\"; sleep 1;
         done;
-        echo '🚀 Dashboard detectado, iniciando Proxy.';
-        exec nginx -g 'daemon off;';
+        i=0;
+        until curl -sSf http://manager:5000 >/dev/null 2>&1 || [ \$i -ge 30 ]; do
+          i=\$((i+1));
+          echo \"esperando manager... (\$i)\"; sleep 1;
+        done;
+        echo '➡️ Iniciando nginx (si los servicios responden, de lo contrario nginx arrancará igual)...';
+        nginx -g 'daemon off;'
       "
 
 networks:
