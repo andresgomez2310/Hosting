@@ -7,10 +7,9 @@ from roble_client import RobleClient
 
 import logging
 import subprocess
-import requests
 import os
-from datetime import datetime
 from activity_monitor import monitor
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
@@ -19,9 +18,8 @@ logger = logging.getLogger(__name__)
 
 roble = RobleClient()
 
-
 # =============================================================
-# TOKEN GLOBAL (siempre viene del monitor)
+# TOKEN GLOBAL
 # =============================================================
 
 def get_manager_token():
@@ -30,9 +28,8 @@ def get_manager_token():
         logger.error("❌ No hay token activo en el Manager.")
     return token
 
-
 # =============================================================
-# OBTENER USER ID DESDE verify-token  (sub)
+# OBTENER USER ID DESDE verify-token
 # =============================================================
 
 def get_user_id():
@@ -43,7 +40,7 @@ def get_user_id():
     try:
         data = roble.verify_token(token)
         user = data.get("user", {})
-        return user.get("sub")     # <-- ID real del usuario
+        return user.get("sub")
     except Exception as e:
         logger.error(f"Error get_user_id(): {e}")
         return None
@@ -111,7 +108,6 @@ def mis_proyectos():
         return jsonify({"error": "No se pudieron obtener los proyectos"}), 500
 
 
-
 # =============================================================
 # OBTENER PROYECTO POR ID
 # =============================================================
@@ -123,7 +119,7 @@ def get_project(project_id):
         return jsonify({"error": "Token requerido"}), 401
 
     try:
-        rows = roble.read_records("proyectos", token)
+        rows = roble.read_records("proyectos", access_token=token)
         match = [p for p in rows if p.get("_id") == project_id]
 
         if not match:
@@ -141,7 +137,7 @@ def get_project(project_id):
 # =============================================================
 
 def get_container(project_id, token):
-    rows = roble.read_records("containers", token)
+    rows = roble.read_records("containers", access_token=token)
     match = [c for c in rows if c.get("project_id") == project_id]
     return match[0] if match else None
 
@@ -213,3 +209,55 @@ def logs_container(project_id):
         return jsonify({"success": True, "logs": logs}), 200
     except Exception as e:
         return jsonify({"error": f"No se pudieron obtener logs: {e}"}), 500
+
+
+# =============================================================
+# DELETE PROJECT (ELIMINA CONTENEDOR + HOST + ROBLE)
+# =============================================================
+
+@proyectos_blueprint.route("/delete/<project_id>", methods=["DELETE"])
+def delete_project(project_id):
+    token = get_manager_token()
+    if not token:
+        return jsonify({"error": "Token requerido"}), 401
+
+    user_id = get_user_id()
+    if not user_id:
+        return jsonify({"error": "Token inválido"}), 401
+
+    # Obtener proyecto
+    registros = roble.read_records("proyectos", filters={"_id": project_id}, access_token=token)
+
+    if not registros:
+        return jsonify({"error": "Proyecto no encontrado"}), 404
+
+    proyecto = registros[0]
+
+    if proyecto["user_id"] != user_id:
+        return jsonify({"error": "No autorizado"}), 403
+
+    # ============== ELIMINAR CONTENEDOR ==============
+    container_id = proyecto.get("container_id")
+    if container_id:
+        try:
+            subprocess.call(["docker", "rm", "-f", container_id])
+        except Exception as e:
+            logger.error(f"❌ Error eliminando contenedor: {e}")
+
+    # ============== ELIMINAR HOST DEL NGINX PROXY ==============
+    host = proyecto.get("host")
+    if host:
+        try:
+            os.system(f"rm -f /etc/nginx/conf.d/{host}.conf")
+            os.system("nginx -s reload")
+        except Exception as e:
+            logger.error(f"❌ Error eliminando host del proxy: {e}")
+
+    # ============== ELIMINAR REGISTRO EN ROBLE ==============
+    try:
+        roble.delete_record("proyectos", project_id, access_token=token)
+    except Exception as e:
+        logger.error(f"❌ Error eliminando en Roble: {e}")
+        return jsonify({"error": "No se pudo eliminar en Roble"}), 500
+
+    return jsonify({"success": True}), 200

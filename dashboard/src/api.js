@@ -120,3 +120,27 @@ export async function updateTable(tableName, description, columns) {
 
   return r.json();
 }
+
+
+// ===============================
+// 🗑️ ELIMINAR PROYECTO
+// ===============================
+export async function deleteProject(id) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return { error: "Sin token" };
+  }
+
+  const r = await fetch(`/projects/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return r.json();
+}
+
+

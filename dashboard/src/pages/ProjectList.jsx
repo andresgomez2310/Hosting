@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMyProjects } from "../api";
+import { getMyProjects, deleteProject as deleteProjectAPI } from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles.css";
 
@@ -8,6 +8,10 @@ export default function ProjectList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // ============================================================
+  // CARGAR PROYECTOS DEL USUARIO
+  // ============================================================
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,34 +47,53 @@ export default function ProjectList() {
     load();
   }, [navigate]);
 
+  // ============================================================
+  // ABRIR PROYECTO EN HOST
+  // ============================================================
+
   const openProject = (p) => {
-    if (!p.host) return alert("Este proyecto no tiene host todavía.");
+    if (!p.host) {
+      alert("Este proyecto no tiene host asignado.");
+      return;
+    }
     window.open(`http://${p.host}`, "_blank");
   };
 
-  const deleteProject = (p) => {
-    const ok = confirm(`¿Eliminar proyecto "${p.name}"?`);
-    if (!ok) return;
+  // ============================================================
+  // ELIMINAR PROYECTO
+  // ============================================================
 
-    // Aquí iría tu delete real si lo implementas:
-    // await deleteProjectAPI(p._id)
+  const deleteProject = async (p) => {
+    if (!confirm(`¿Eliminar proyecto "${p.name}"?`)) return;
 
+    const res = await deleteProjectAPI(p._id);
+
+    if (res.error) {
+      alert("Error eliminando: " + res.error);
+      return;
+    }
+
+    alert("Proyecto eliminado correctamente.");
     setProjects(projects.filter((x) => x._id !== p._id));
   };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   if (loading) return <p>Cargando proyectos…</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="templates-page">
-      <h1 className="templates-title">🗂️ Mis Proyectos</h1>
+      <h1 className="templates-title">📁 Mis Proyectos</h1>
 
       {projects.length === 0 ? (
         <div className="empty-box" style={{ textAlign: "center" }}>
           No tienes proyectos creados todavía.
           <br /><br />
           <Link to="/projects/create" className="btn-small">
-            💡 Crear un nuevo proyecto
+            ➕ Crear nuevo proyecto
           </Link>
         </div>
       ) : (
@@ -89,9 +112,9 @@ export default function ProjectList() {
   );
 }
 
-/* ==========================================================
-   TARJETA DEL PROYECTO (igual estilo que las plantillas)
-   ========================================================== */
+/* ============================================================
+   TARJETA INDIVIDUAL DE PROYECTO
+============================================================ */
 
 function ProjectCard({ project, onOpen, onDelete }) {
   return (
@@ -115,22 +138,24 @@ function ProjectCard({ project, onOpen, onDelete }) {
         </span>
       </div>
 
-      {/* INFO */}
+      {/* INFORMACIÓN */}
       <div className="project-info">
         <p><strong>🔗 Repositorio:</strong> {project.rep_url}</p>
-        <p><strong>🌐 Host:</strong> {project.host}</p>
+        <p><strong>🌐 Host:</strong> {project.host || "No asignado"}</p>
         <p><strong>📦 Contenedor:</strong> {project.container_id || "No asignado"}</p>
 
         <p style={{ marginTop: "10px" }}>
-          🕒 <strong>Creado:</strong> {new Date(project.created_at).toLocaleString()}
+          🕒 <strong>Creado:</strong>{" "}
+          {new Date(project.created_at).toLocaleString()}
         </p>
 
         <p>
-          🔄 <strong>Último acceso:</strong> {new Date(project.last_access).toLocaleString()}
+          🔄 <strong>Último acceso:</strong>{" "}
+          {new Date(project.last_access).toLocaleString()}
         </p>
       </div>
 
-      {/* BOTONES */}
+      {/* ACCIONES */}
       <div className="project-actions">
         <button className="project-btn" onClick={() => onOpen(project)}>
           🌍 Abrir
